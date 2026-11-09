@@ -2,6 +2,8 @@
 
 A **WeMos D1 mini** (ESP8266) wired to a PS/2 plug becomes a WiFi modem for the **[XPC ESP32](https://github.com/lgpf/xpc-esp32)** emulator. Plug it into the TTGO VGA32 **mouse port**, set *Mouse port* to `Serial COM1` (or `Auto`), and any DOS terminal — Telix, Procomm, Qmodem — can dial telnet BBSes with `ATDT host:port`.
 
+![XPC Mini Modem in its 3D-printed case](docs/minimodem_case.jpg)
+
 And it sounds right: before connecting, a small piezo plays the **Brazilian dial tone, the DTMF digits, the ring-back and a real modem handshake**. After `CONNECT`, silence.
 
 The firmware is a variant of **RetroWiFiModem** (ESP8266 RS232↔WiFi modem with Hayes AT commands), adapted to run without the MAX3232, the DFPlayer and the RS232 control lines.
@@ -22,9 +24,17 @@ The XPC is a complete PC/XT on a single board, and a PC/XT of the BBS era deserv
 | 1 electrolytic capacitor 470 µF / 10 V+ | between 5V and G — absorbs WiFi current peaks |
 | 1 capacitor 10 µF (ceramic "106" or electrolytic) | between RST and G — clean start together with the TTGO |
 | 1 piezo disc 27 mm (passive), optional | between D5 and G — dial/handshake sounds |
-| 3D-printed case | STL files in [`stl/`](stl) |
+| 3D-printed case | see the table below |
 
 All parts are through-hole.
+
+### 3D-printed case
+
+| File | Material | Notes |
+|---|---|---|
+| [`stl/xpc-minimodem-top.stl`](stl/xpc-minimodem-top.stl) | PLA | top with the sound grille (piezo glued by its brass rim) |
+| [`stl/xpc-minimodem-bottom.stl`](stl/xpc-minimodem-bottom.stl) | PLA | bottom |
+| [`stl/xpc-minimodem-cable-tpu.stl`](stl/xpc-minimodem-cable-tpu.stl) | **TPU** (flexible) | cable strain relief — fits the case cutout, locks the cable inside and leaves 1 cm of flexible boot outside to keep the cable from bending sharply |
 
 ### Wiring
 
@@ -50,6 +60,15 @@ Flash `bin/RetroWiFiModemXPC_d1mini.bin` at **0x0** through the WeMos USB port (
 esptool.py --chip esp8266 --port COM5 erase_flash
 esptool.py --chip esp8266 --port COM5 --baud 460800 write_flash -fm dio -fs 4MB 0x0 bin/RetroWiFiModemXPC_d1mini.bin
 ```
+
+**With Espressif's Flash Download Tool (Windows):**
+
+1. Run `flash_download_tool_x.x.x.exe`, choose **ChipType: ESP8266**, **WorkMode: Develop**, **LoadMode: UART**.
+2. In the first line, tick the box, pick `bin/RetroWiFiModemXPC_d1mini.bin` and type **0x0** in the address field (`@ 0x0`).
+3. **SPI SPEED: 40MHz**, **SPI MODE: DIO**, **FLASH SIZE: 32Mbit** (4 MB), leave *DoNotChgBin* ticked.
+4. Select the WeMos **COM** port (CH340) and **BAUD 460800**.
+5. Click **ERASE** and wait for *FINISH* (clears old WiFi settings).
+6. Click **START** and wait for *FINISH*. The WeMos D1 mini enters flash mode by itself; after *FINISH* press its RST button.
 
 Then, still on USB, with any serial terminal at **9600 8N1**:
 
